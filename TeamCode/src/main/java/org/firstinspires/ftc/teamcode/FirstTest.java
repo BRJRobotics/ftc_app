@@ -53,7 +53,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Template: Iterative OpMode", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
+//@Disabled
 public class FirstTest extends OpMode
 {
     /* Declare OpMode members. */
@@ -78,7 +78,7 @@ public class FirstTest extends OpMode
 
         // eg: Set the drive motor directions:
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        //leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         // rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
         telemetry.addData("Status", "Initialized");
     }
@@ -106,7 +106,7 @@ public class FirstTest extends OpMode
         telemetry.addData("Status", "Running: " + runtime.toString());
 
         // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
-        leftMotor.setPower(-gamepad1.left_stick_y);
+        leftMotor.setPower(gamepad1.left_stick_y);
         rightMotor.setPower(-gamepad1.right_stick_y);
     }
 
