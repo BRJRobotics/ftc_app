@@ -61,6 +61,8 @@ public class FirstTest extends OpMode
 
     private DcMotor leftMotor = null;
     private DcMotor rightMotor = null;
+    private DcMotor wench = null;
+    private DcMotor doorslides = null;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -75,6 +77,8 @@ public class FirstTest extends OpMode
          */
         leftMotor  = hardwareMap.dcMotor.get("leftDrive");
         rightMotor = hardwareMap.dcMotor.get("rightDrive");
+        wench = hardwareMap.dcMotor.get("wench");
+        doorslides = hardwareMap.dcMotor.get("doorslides");
 
         // eg: Set the drive motor directions:
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -108,6 +112,11 @@ public class FirstTest extends OpMode
         // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
         leftMotor.setPower(gamepad1.left_stick_y);
         rightMotor.setPower(-gamepad1.right_stick_y);
+
+        wench.setPower(gamepad2.right_stick_y);
+        doorslides.setPower(gamepad2.left_stick_y);
+
+
     }
 
     /*
