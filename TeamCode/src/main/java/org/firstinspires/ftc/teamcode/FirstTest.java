@@ -52,7 +52,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Template: Iterative OpMode", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Drive", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class FirstTest extends OpMode
 {
@@ -116,7 +116,10 @@ public class FirstTest extends OpMode
         wench.setPower(gamepad2.right_stick_y);
         doorslides.setPower(gamepad2.left_stick_y);
 
-
+        telemetry.addData("Right", "Power: " + leftMotor.getPower());
+        telemetry.addData("Left", "Power: " + rightMotor.getPower());
+        telemetry.addData("Wench", "Power: " + wench.getPower());
+        telemetry.addData("Doorslides", "Power: " + doorslides.getPower());
     }
 
     /*
