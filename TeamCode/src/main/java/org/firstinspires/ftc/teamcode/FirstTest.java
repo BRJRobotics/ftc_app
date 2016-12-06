@@ -32,10 +32,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.hardware.Sensor;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -63,6 +66,7 @@ public class FirstTest extends OpMode
     private DcMotor rightMotor = null;
     private DcMotor wench = null;
     private DcMotor doorslides = null;
+    private LightSensor colors= null;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -79,6 +83,7 @@ public class FirstTest extends OpMode
         rightMotor = hardwareMap.dcMotor.get("rightDrive");
         wench = hardwareMap.dcMotor.get("wench");
         doorslides = hardwareMap.dcMotor.get("doorslides");
+        colors=hardwareMap.lightSensor.get("colors");
 
         // eg: Set the drive motor directions:
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -120,6 +125,8 @@ public class FirstTest extends OpMode
         telemetry.addData("Left", "Power: " + rightMotor.getPower());
         telemetry.addData("Wench", "Power: " + wench.getPower());
         telemetry.addData("Doorslides", "Power: " + doorslides.getPower());
+
+        telemetry.addData("Light Detected ", + colors.getLightDetected());
     }
 
     /*
