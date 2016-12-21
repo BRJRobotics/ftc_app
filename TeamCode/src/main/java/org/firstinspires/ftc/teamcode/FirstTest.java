@@ -37,8 +37,10 @@ import android.hardware.Sensor;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -67,6 +69,9 @@ public class FirstTest extends OpMode
     private DcMotor wench = null;
     private DcMotor doorslides = null;
 
+    private Servo servo1;
+    private ColorSensor color_sensor;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -82,6 +87,9 @@ public class FirstTest extends OpMode
         rightMotor = hardwareMap.dcMotor.get("rightDrive");
         wench = hardwareMap.dcMotor.get("wench");
         doorslides = hardwareMap.dcMotor.get("doorslides");
+
+        servo1 = hardwareMap.servo.get("servo");
+        color_sensor = hardwareMap.colorSensor.get("colorSensor");
 
         // eg: Set the drive motor directions:
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -119,10 +127,29 @@ public class FirstTest extends OpMode
         wench.setPower(gamepad2.right_stick_y);
         doorslides.setPower(gamepad2.left_stick_y);
 
+
+
+
+        if(gamepad2.a)
+        {
+
+            servo1.setPosition(1);
+        }
+        else
+        {
+            servo1.setPosition(.8);
+        }
+
         telemetry.addData("Right", "Power: " + leftMotor.getPower());
         telemetry.addData("Left", "Power: " + rightMotor.getPower());
         telemetry.addData("Wench", "Power: " + wench.getPower());
         telemetry.addData("Doorslides", "Power: " + doorslides.getPower());
+        telemetry.addData("Servo", "Position: " + servo1.getPosition());
+
+        telemetry.addData("Color Sensor", "Red: "+ color_sensor.red());
+        telemetry.addData("Color Sensor", "Blue: "+ color_sensor.blue());
+        telemetry.addData("Color Sensor", "Green: "+ color_sensor.green());
+
 
     }
 
