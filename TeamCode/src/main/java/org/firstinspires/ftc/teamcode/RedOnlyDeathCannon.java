@@ -32,13 +32,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import android.hardware.Sensor;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
         /**
@@ -54,17 +51,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
          * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
          */
 
-        @Autonomous(name="Red", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-        //@Disabled
+        @Autonomous(name="RedGun", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+        @Disabled
         //red
-        public class ActivePassive extends LinearOpMode {
+        public class RedOnlyDeathCannon extends LinearOpMode {
 
             /* Declare OpMode members. */
             private ElapsedTime runtime = new ElapsedTime();
             private DcMotor leftMotor = null;
             private DcMotor rightMotor = null;
-            private ColorSensor color_sensor;
-            private Servo servo1;
+            private DcMotor gun = null;
 
             @Override
             public void runOpMode() {
@@ -77,53 +73,31 @@ import com.qualcomm.robotcore.util.ElapsedTime;
                  */
                 leftMotor = hardwareMap.dcMotor.get("leftDrive");
                 rightMotor = hardwareMap.dcMotor.get("rightDrive");
-                servo1 = hardwareMap.servo.get("servo");
-                color_sensor = hardwareMap.colorSensor.get("colorSensor");
-
+                gun = hardwareMap.dcMotor.get("gun");
                 // eg: Set the drive motor directions:
                 // "Reverse" the motor that runs backwards when connected directly to the battery
                 // leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-                rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+                //rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
                 // Wait for the game to start (driver presses PLAY)
                 waitForStart();
-                servo1.setPosition(.8);
 
-                //Forward till
-                driveForward(.1);
+                driveForward(0);
+                Telemetry("foward", .1);
+                stopMoving();
 
-                //sense button somehow and does if
-                if(color_sensor.red()==0 && color_sensor.blue()==0 && color_sensor.green()==0) {
-                    driveForward(0); //stops robot
-                    // if sense red first, need to change values
-                    if(color_sensor.red()==0 && color_sensor.blue()==0) {
-                        //go forward for .5 seconds, change values
-                        driveForward(.5);
-                        Telemetry("Red Detected", .1);
-                        driveForward(0);
-                        //servo presses button
-                        servo1.setPosition(1);
-                    }
-                    //if sense blue first
-                    if(color_sensor.red()==0 && color_sensor.blue()==0) {
-                        //go backwards for .2 seconds, need to change values
-                        driveForward(-.5);
-                        Telemetry("Blue Detected", .2);
-                        driveForward(0);
-                        //servo presses button
-                        servo1.setPosition(1);
-                    }
-                }
-
-
-
-
+                gunShoots(.5);
+                Telemetry("Shoots", 2);
+                gunShoots(0);
             }
 
             public void Telemetry(String event, double time) {
                 runtime.reset();
                 while (opModeIsActive() && (runtime.seconds() < time)) {
                     telemetry.addData(event, "S Elapsed " + runtime.seconds());
+                    telemetry.addData("Right ", leftMotor.getPower());
+                    telemetry.addData("Left ", rightMotor.getPower());
+                    telemetry.addData("Gun ", gun.getPower());
                     telemetry.update();
                 }
             }
@@ -133,10 +107,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
                 rightMotor.setPower(power);
             }
 
+            public void driveBack(double power) {
+                leftMotor.setPower(-power);
+                rightMotor.setPower(-power);
+            }
+
             public void stopMoving(){
                 leftMotor.setPower(0);
                 rightMotor.setPower(0);
-                doorslides.setPower(0);
+                gun.setPower(0);
             }
 
             public void turn(double powerRight, double powerLeft) {
@@ -153,4 +132,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
                 leftMotor.setPower(-power);
                 rightMotor.setPower(power);
             }
+
+            public void gunShoots(double gunPower) {
+                gun.setPower(-gunPower);
+            }
+
         }

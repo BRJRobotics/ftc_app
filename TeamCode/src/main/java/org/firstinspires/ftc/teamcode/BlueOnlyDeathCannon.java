@@ -1,4 +1,4 @@
-        /*
+/*
 Copyright (c) 2016 Robert Atkinson
 
 All rights reserved.
@@ -35,10 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -54,18 +51,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="blueGun", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
-//red
-public class Red extends LinearOpMode {
+//blue
+public class BlueOnlyDeathCannon extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftMotor = null;
     private DcMotor rightMotor = null;
     private DcMotor gun = null;
-    private Servo button;
-    private ColorSensor color;
 
     @Override
     public void runOpMode() {
@@ -79,92 +74,28 @@ public class Red extends LinearOpMode {
         leftMotor = hardwareMap.dcMotor.get("leftDrive");
         rightMotor = hardwareMap.dcMotor.get("rightDrive");
         gun = hardwareMap.dcMotor.get("gun");
-        button = hardwareMap.servo.get("button");
-        color = hardwareMap.colorSensor.get("color");
+
         // eg: Set the drive motor directions:
         // "Reverse" the motor that runs backwards when connected directly to the battery
-        // leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        //leftMotor.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         //rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        button.setPosition(.87);
+        driveForward(0);
+        Telemetry("foward", .1);
+        stopMoving();
 
         gunShoots(.5);
-        Telemetry("Shoots", 2);
-        gunShoots(0);
-
-        turnLeft(.3);
-        Telemetry("turn", .5);
-        driveForward(.8);
-        Telemetry("forward", .5);
-        //exact same as before turn
-        turnRight(.3);
-        Telemetry("turn", .5);
-
-        driveForward(.8);
-        if(color.red() > 2){
-            driveForward(.3);
-            if(color.red() == color.blue()){
-                driveBack(.3);
-                Telemetry("back", .1);
-                stopMoving();
-
-                button.setPosition(1);
-                button.setPosition(.87);
-
-                driveForward(.8);
-                Telemetry("forward", .5);
-            }
-        }
-        else if(color.blue() > 2){
-            driveForward(.3);
-            if(color.red() == color.blue()){
-                driveForward(.3);
-                Telemetry("forward", .08);
-                stopMoving();
-                button.setPosition(1);
-                button.setPosition(.87);
-
-                driveForward(.8);
-                Telemetry("forward", .5);
-            }
-        }
-
-        driveForward(.8);
-        if(color.red() > 2){
-            driveForward(.3);
-            if(color.red() == color.blue()){
-                driveBack(.3);
-                Telemetry("back", .1);
-                stopMoving();
-
-                button.setPosition(1);
-                button.setPosition(.87);
-            }
-        }
-        else if(color.blue() > 2){
-            driveForward(.3);
-            if(color.red() == color.blue()){
-                driveForward(.3);
-                Telemetry("forward", .08);
-                stopMoving();
-
-                button.setPosition(1);
-                button.setPosition(.87);
-            }
-        }
-
-
+        Telemetry("Shoots", 2.5);
     }
+
 
     public void Telemetry(String event, double time) {
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < time)) {
             telemetry.addData(event, "S Elapsed " + runtime.seconds());
-            telemetry.addData("Red ", color.red());
-            telemetry.addData("Blue ", color.blue());
             telemetry.addData("Right ", leftMotor.getPower());
             telemetry.addData("Left ", rightMotor.getPower());
             telemetry.addData("Gun ", gun.getPower());
@@ -206,5 +137,4 @@ public class Red extends LinearOpMode {
     public void gunShoots(double gunPower) {
         gun.setPower(-gunPower);
     }
-
 }

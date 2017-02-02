@@ -43,119 +43,85 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-/**
- * This file contains an example of an iterative (Non-Linear) "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
- * It includes all the skeletal structure that all iterative OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
-@TeleOp(name="Drive", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Drive", group="Iterative Opmode")
 //@Disabled
 public class FirstTest extends OpMode
 {
-    /* Declare OpMode members. */
+    //Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-
     private DcMotor leftMotor = null;
     private DcMotor rightMotor = null;
     private DcMotor wench = null;
     private DcMotor doorslides = null;
+    private Servo gear;
+    private ColorSensor color;
+    private DcMotor deathcannon = null;
 
-    private Servo servo1;
-    private ColorSensor color_sensor;
-
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
+    //Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
 
-        /* eg: Initialize the hardware variables. Note that the strings used here as parameters
-         * to 'get' must correspond to the names assigned during the robot configuration
-         * step (using the FTC Robot Controller app on the phone).
-         */
-        leftMotor  = hardwareMap.dcMotor.get("leftDrive");
-        rightMotor = hardwareMap.dcMotor.get("rightDrive");
+        //Initialize the hardware variables. Same as configuration on phone
+        leftMotor  = hardwareMap.dcMotor.get("left");
+        rightMotor = hardwareMap.dcMotor.get("right");
         wench = hardwareMap.dcMotor.get("wench");
         doorslides = hardwareMap.dcMotor.get("doorslides");
+        gear = hardwareMap.servo.get("gear");
+        color = hardwareMap.colorSensor.get("color");
+        deathcannon = hardwareMap.dcMotor.get("deathcannon");
 
-        servo1 = hardwareMap.servo.get("servo");
-        color_sensor = hardwareMap.colorSensor.get("colorSensor");
-
-        // eg: Set the drive motor directions:
-        // Reverse the motor that runs backwards when connected directly to the battery
-        //leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        // rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
         telemetry.addData("Status", "Initialized");
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
+    //Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
     @Override
     public void init_loop() {
     }
 
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
+    //Code to run ONCE when the driver hits PLAY
     @Override
     public void start() {
         runtime.reset();
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
+    //Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
 
-        // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
+        //set motors
         leftMotor.setPower(gamepad1.left_stick_y);
         rightMotor.setPower(-gamepad1.right_stick_y);
-
         wench.setPower(gamepad2.right_stick_y);
         doorslides.setPower(gamepad2.left_stick_y);
+        deathcannon.setPower(-gamepad1.left_trigger);
 
-
-
-
+        //set button pusher
+        color.enableLed(false);
         if(gamepad2.a)
         {
 
-            servo1.setPosition(1);
+            gear.setPosition(Servo.MIN_POSITION);
         }
-        else
+        if(gamepad2.b)
         {
-            servo1.setPosition(.8);
+            gear.setPosition(Servo.MAX_POSITION * 3 / 5);
+
         }
 
-        telemetry.addData("Right", "Power: " + leftMotor.getPower());
-        telemetry.addData("Left", "Power: " + rightMotor.getPower());
-        telemetry.addData("Wench", "Power: " + wench.getPower());
-        telemetry.addData("Doorslides", "Power: " + doorslides.getPower());
-        telemetry.addData("Servo", "Position: " + servo1.getPosition());
-
-        telemetry.addData("Color Sensor", "Red: "+ color_sensor.red());
-        telemetry.addData("Color Sensor", "Blue: "+ color_sensor.blue());
-        telemetry.addData("Color Sensor", "Green: "+ color_sensor.green());
-
-
+        //all telemetry
+        telemetry.addData("Left ", leftMotor.getPower());
+        telemetry.addData("Right ", rightMotor.getPower());
+        telemetry.addData("Wench ", wench.getPower());
+        telemetry.addData("Doorslides ", doorslides.getPower());
+        telemetry.addData("Deathcannon", deathcannon.getPower());
+        telemetry.addData("Red ", color.red());
+        telemetry.addData("Blue ", color.blue());
+        telemetry.addData("Servo Position ", gear.getPosition());
     }
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
+    //Code to run ONCE after the driver hits STOP
     @Override
     public void stop() {
     }

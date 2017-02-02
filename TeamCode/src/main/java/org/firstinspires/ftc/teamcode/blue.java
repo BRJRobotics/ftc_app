@@ -33,8 +33,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -51,7 +55,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="blue", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 //blue
 public class blue extends LinearOpMode {
 
@@ -59,7 +63,9 @@ public class blue extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftMotor = null;
     private DcMotor rightMotor = null;
-    private DcMotor doorslides = null;
+    private DcMotor gun = null;
+    private Servo button;
+    private ColorSensor color;
 
     @Override
     public void runOpMode() {
@@ -72,43 +78,94 @@ public class blue extends LinearOpMode {
          */
         leftMotor = hardwareMap.dcMotor.get("leftDrive");
         rightMotor = hardwareMap.dcMotor.get("rightDrive");
-        doorslides = hardwareMap.dcMotor.get("doorslides");
+        gun = hardwareMap.dcMotor.get("gun");
+        button = hardwareMap.servo.get("button");
+        color = hardwareMap.colorSensor.get("color");
 
         // eg: Set the drive motor directions:
         // "Reverse" the motor that runs backwards when connected directly to the battery
-        // leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        leftMotor.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        driveForward(.1);
-        Telemetry("Forward", 1.6);
+        button.setPosition(.85);
 
-        //Turns to aim at goal post
-        turn(.05,-.05);
-        Telemetry("turn", 1.29);
-        turn(0,0);
+        gunShoots(.5);
+        Telemetry("Shoots", 2.5);
 
-        //Activates mousetrap
-        mousetrap(1);
-        Telemetry("Goal", .17);
-        mousetrap(0);
+        //NEGATIVE POWER because reversed direction ^^^, turn in circle
+        driveForward(-.5);
+        Telemetry("foward", .2);
+        turn(-.1,.1);
+        Telemetry("turn around", .5);
 
-        //Turns back to drive to center
-        turn(.05,.05);
-        Telemetry("back", 1.3);
+
+        turnRight(.3);
+        Telemetry("turn", .5);
+        driveForward(.8);
+        Telemetry("forward", .4);
+        //same as before turn
+        turnLeft(.3);
+        Telemetry("turn", .5);
+
+        //opposite from red autonomous as blue first
+        driveForward(.8);
+        if(color.blue() > 2){
+            driveForward(.3);
+            if(color.blue() == color.red()){
+                driveBack(.3);
+                Telemetry("back", .1);
+                stopMoving();
+
+                button.setPosition(1);
+                button.setPosition(.87);
+
+                driveForward(.8);
+                Telemetry("forward", .5);
+            }
+        }
+        else if(color.red() > 2){
+            driveForward(.3);
+            if(color.blue() == color.red()){
+                driveForward(.3);
+                Telemetry("forward", .08);
+                stopMoving();
+
+                button.setPosition(1);
+                button.setPosition(.87);
+
+                driveForward(.8);
+                Telemetry("forward", .5);
+            }
+        }
 
         driveForward(.8);
-        Telemetry("Forward", .98);
+        if(color.blue() > 2){
+            driveForward(.3);
+            if(color.blue() == color.red()){
+                driveBack(.3);
+                Telemetry("back", .1);
+                stopMoving();
 
-        //Turns to push cap ball (Right motor power,Left motor power)
-        turn(0.07, -0.07);
-        Telemetry("Turn", .77);//.88
+                button.setPosition(1);
+                button.setPosition(.87);
+            }
+        }
+        else if(color.red() > 2){
+            driveForward(.3);
+            if(color.blue() == color.red()){
+                driveForward(.3);
+                Telemetry("forward", .08);
+                stopMoving();
 
-        //drives back to park
-        driveForward(-0.1);
-        Telemetry("Ramp", .55);//.45
+                button.setPosition(1);
+                button.setPosition(.87);
+
+            }
+        }
+
     }
 
 
@@ -116,6 +173,11 @@ public class blue extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < time)) {
             telemetry.addData(event, "S Elapsed " + runtime.seconds());
+            telemetry.addData("Red ", color.red());
+            telemetry.addData("Blue ", color.blue());
+            telemetry.addData("Right ", leftMotor.getPower());
+            telemetry.addData("Left ", rightMotor.getPower());
+            telemetry.addData("Gun ", gun.getPower());
             telemetry.update();
         }
     }
@@ -123,7 +185,17 @@ public class blue extends LinearOpMode {
     public void driveForward(double power) {
         leftMotor.setPower(power);
         rightMotor.setPower(power);
+    }
 
+    public void driveBack(double power) {
+        leftMotor.setPower(-power);
+        rightMotor.setPower(-power);
+    }
+
+    public void stopMoving(){
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        gun.setPower(0);
     }
 
     public void turn(double powerRight, double powerLeft) {
@@ -131,7 +203,17 @@ public class blue extends LinearOpMode {
         rightMotor.setPower(powerRight);
     }
 
-    public void mousetrap(double turnpower)  {
-        doorslides.setPower(-turnpower);
+    public  void turnLeft(double power) {
+        leftMotor.setPower(power);
+        rightMotor.setPower(-power);
+    }
+
+    public  void turnRight(double power) {
+        leftMotor.setPower(-power);
+        rightMotor.setPower(power);
+    }
+
+    public void gunShoots(double gunPower) {
+        gun.setPower(-gunPower);
     }
 }
